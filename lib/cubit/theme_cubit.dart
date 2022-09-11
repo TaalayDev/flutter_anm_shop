@@ -14,7 +14,7 @@ class ThemeCubit extends Cubit<ThemeState> {
           appTheme: AppTheme.fromType(type),
         ));
 
-  final ILocaleStorage storage;
+  final LocaleStorage storage;
 
   void changeThemeType(ThemeType type) {
     if (state.appTheme.type != type) {

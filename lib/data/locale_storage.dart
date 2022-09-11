@@ -1,10 +1,25 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:malbazar/imports.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-abstract class ILocaleStorage {
+import '../imports.dart';
+
+abstract class LocaleStorage {
+  static LocaleStorage? _instance;
+  static LocaleStorage get instance => _instance!;
+
+  factory LocaleStorage() => instance;
+
+  LocaleStorage._();
+
+  static init() async {
+    assert(_instance == null);
+    final impl = SharedPrefLocaleStorageImpl._();
+    await impl.init();
+    _instance = impl;
+    return _instance!;
+  }
+
   void setInt(String key, int value);
   void setDouble(String key, double value);
   void setBool(String key, bool value);
@@ -38,22 +53,12 @@ abstract class ILocaleStorage {
   set firstRun(bool val) => setBool('first_run', val);
 }
 
-class LocaleStorage extends ILocaleStorage {
-  static LocaleStorage? _instance;
+class SharedPrefLocaleStorageImpl extends LocaleStorage {
   SharedPreferences? _preferences;
 
-  static LocaleStorage get instance => _instance!;
+  SharedPrefLocaleStorageImpl._() : super._();
 
-  LocaleStorage._();
-  factory LocaleStorage() => instance;
-
-  static init() {
-    assert(_instance == null);
-    _instance = LocaleStorage._();
-    _instance!._init();
-  }
-
-  void _init() async {
+  Future<void> init() async {
     _preferences ??= await SharedPreferences.getInstance();
   }
 
@@ -75,7 +80,6 @@ class LocaleStorage extends ILocaleStorage {
   List<String>? getStringList(String key) => _preferences?.getStringList(key);
   dynamic getObject(String key) {
     final value = _preferences?.getString(key);
-    print('get object value $value');
     if (value != null) jsonDecode(value);
     return null;
   }
