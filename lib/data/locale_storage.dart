@@ -14,9 +14,7 @@ abstract class LocaleStorage {
 
   static init() async {
     assert(_instance == null);
-    final impl = SharedPrefLocaleStorageImpl._();
-    await impl.init();
-    _instance = impl;
+    _instance = await SharedPrefLocaleStorageImpl._().init();
     return _instance!;
   }
 
@@ -58,8 +56,9 @@ class SharedPrefLocaleStorageImpl extends LocaleStorage {
 
   SharedPrefLocaleStorageImpl._() : super._();
 
-  Future<void> init() async {
+  Future<SharedPrefLocaleStorageImpl> init() async {
     _preferences ??= await SharedPreferences.getInstance();
+    return this;
   }
 
   void setInt(String key, int value) => _preferences?.setInt(key, value);
